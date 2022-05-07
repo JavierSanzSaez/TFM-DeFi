@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.O
 pragma solidity ^0.8.0;
  
 //Safe Math Interface
@@ -28,23 +29,16 @@ contract SafeMath {
  
 //ERC Token Standard #20 Interface
  
-contract ERC20Interface {
-    function totalSupply() public view returns (uint);
-    function balanceOf(address tokenOwner) public view returns (uint balance);
-    function allowance(address tokenOwner, address spender) public view returns (uint remaining);
-    function transfer(address to, uint tokens) public returns (bool success);
-    function approve(address spender, uint tokens) public returns (bool success);
-    function transferFrom(address from, address to, uint tokens) public returns (bool success);
+interface ERC20Interface {
+    function totalSupply() external view returns (uint);
+    function balanceOf(address tokenOwner) external view returns (uint balance);
+    function allowance(address tokenOwner, address spender) external view returns (uint remaining);
+    function transfer(address to, uint tokens) external returns (bool success);
+    function approve(address spender, uint tokens) external returns (bool success);
+    function transferFrom(address from, address to, uint tokens) external returns (bool success);
  
     event Transfer(address indexed from, address indexed to, uint tokens);
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
-}
- 
- 
-//Contract function to receive approval and execute function in one call
- 
-contract ApproveAndCallFallBack {
-    function receiveApproval(address from, uint256 tokens, address token, bytes data) public;
 }
  
 //Actual token contract
@@ -100,14 +94,7 @@ contract EuriCoin is ERC20Interface, SafeMath {
         return allowed[tokenOwner][spender];
     }
  
-    function approveAndCall(address spender, uint tokens, bytes data) public returns (bool success) {
-        allowed[msg.sender][spender] = tokens;
-        emit Approval(msg.sender, spender, tokens);
-        ApproveAndCallFallBack(spender).receiveApproval(msg.sender, tokens, this, data);
-        return true;
-    }
- 
-    function () public payable {
+    receive() external payable {
         revert();
     }
 }
