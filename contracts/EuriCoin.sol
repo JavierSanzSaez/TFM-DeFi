@@ -27,7 +27,7 @@ contract SafeMath {
 }
  
  
-//ERC Token Standard #20 Interface
+//ERC-20 Token Standard Interface
  
 interface ERC20Interface {
     function totalSupply() external view returns (uint);
@@ -52,13 +52,12 @@ contract EuriCoin is ERC20Interface, SafeMath {
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
  
-    constructor() public {
+    constructor(address vaultContract){
         symbol = "EURI";
         name = "EuriCoin";
         decimals = 18;
         _totalSupply = 100000;
-        balances[msg.sender] = _totalSupply;
-        emit Transfer(address(0), msg.sender, _totalSupply);
+        balances[vaultContract] = _totalSupply;
     }
  
     function totalSupply() public view returns (uint) {
