@@ -39,7 +39,7 @@ contract SafeMath {
     }
 }
  
-contract StorageContract is SafeMath{
+contract VaultContract is SafeMath{
 
     mapping(address => address[]) public index_collateral; // Which tokens the index references to
     mapping(address => uint256[]) public index_quantities; // How many of each token the index references to
