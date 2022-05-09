@@ -1,2 +1,4 @@
 ganache-*
 bin*
+TFM*
+build/contracts/*

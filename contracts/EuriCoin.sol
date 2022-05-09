@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
  
 //Safe Math Interface
  
-contract SafeMath {
+contract SafeMath_ERC20 {
  
     function safeAdd(uint a, uint b) public pure returns (uint c) {
         c = a + b;
@@ -29,7 +29,7 @@ contract SafeMath {
  
 //ERC-20 Token Standard Interface
  
-interface ERC20Interface {
+interface ERC20Interface_EuriCoin {
     function totalSupply() external view returns (uint);
     function balanceOf(address tokenOwner) external view returns (uint balance);
     function allowance(address tokenOwner, address spender) external view returns (uint remaining);
@@ -43,7 +43,7 @@ interface ERC20Interface {
  
 //Actual token contract
  
-contract EuriCoin is ERC20Interface, SafeMath {
+contract EuriCoin is ERC20Interface_EuriCoin, SafeMath_ERC20 {
     string public symbol;
     string public  name;
     uint8 public decimals;

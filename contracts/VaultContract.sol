@@ -41,10 +41,15 @@ contract SafeMath {
  
 contract VaultContract is SafeMath{
 
-    mapping(address => address[]) public index_collateral; // Which tokens the index references to
-    mapping(address => uint256[]) public index_quantities; // How many of each token the index references to
+    struct Index{
+        uint id; // The id of the index
+        address[] index_collateral; // Which tokens the index references to
+        uint256[] index_quantities; // How many of each token the index references to
+        }
 
-    address masterContract;
+    mapping (address => Index[]) public index;
+
+    address public masterContract;
 
     constructor(){
         masterContract = msg.sender; // Initially the deployer is the "master contract". We will then change that with "setMasterContract"
@@ -69,16 +74,18 @@ contract VaultContract is SafeMath{
         }
     }
 
-    function set_collateral(address index, address[] calldata collateral ) private{
+    function set_collateral(address _index, address[] calldata collateral ) private{
         require(index != address(0),"Cannot send the null address as args");
         require(collateral.length > 0, "Cannot send empty array as args");
-        index_collateral[index] = collateral;
+        uint256[] storage index_collateral = index[_index].index_collateral;
+        index_collateral = collateral;
     }
 
-    function set_quantities(address index, uint256[] calldata quantities ) private{
+    function set_quantities(address _index, uint256[] calldata quantities ) private{
         require(index != address(0),"Cannot send the null address as args");
         require(quantities.length > 0, "Cannot send empty array as args");
-        index_quantities[index] = quantities;
+        uint256[] storage index_quantities = index[_index].index_quantities;
+        index_quantities = quantities;
     }
 
     function register_index(address index, address[] calldata collateral, uint256[] calldata quantities) public onlyMasterContract{
