@@ -7,6 +7,8 @@ contract StorageContract {
     address public vaultContract;
     address public factoryContract;
     mapping(address => bool) is_admin;
+    mapping(address => address) index_creators;
+    address[] public indices;
 
     modifier onlyAdmins{
         require(
@@ -31,5 +33,16 @@ contract StorageContract {
     }
     function addAdmin(address new_admin) public onlyAdmins{
         is_admin[new_admin] = true;
+    }
+    function checkIfAdmin(address _address) public onlyAdmins view returns(bool _is_admin){
+        _is_admin = is_admin[_address]; 
+    }
+    function addNewIndex(address _index, address creator) public onlyAdmins{
+        indices.push(_index);
+        index_creators[_index] = creator;
+
+    }
+    function getIndexCreator(address _index) public onlyAdmins view returns(address creator){
+        creator = index_creators[_index];
     }
 }
