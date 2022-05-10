@@ -1,4 +1,4 @@
-pragma solidity ^0.8.0;
+pragma solidity >=0.8.13;
 
 import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
@@ -30,14 +30,18 @@ contract TestVaultContract {
 
         uint256[] memory deposited_quantitites;
         deposited_quantitites[0] = 1;
-        deposited_quantitites[1] = 1;
+        deposited_quantitites[1] = 2;
 
         vault.register_index(coin_address, deposited_collateral, deposited_quantitites);
-        address[] memory collateral = vault.index_collateral(coin_address);
-        uint256[] memory quantities = vault.index_quantities(coin_address);
+        address[] memory collateral = vault.get_index(coin_address).index_collateral;
+        uint256[] memory quantities = vault.get_index(coin_address).index_quantities;
 
-        Assert.equal(collateral[0],[coin_address, coin_address], "EuriCoin should appear as collateral");
-        Assert.equal(quantities[0],[1,1], "There should only be 1 EuriCoin");
+        Assert.equal(collateral,[coin_address, coin_address], "EuriCoin should appear as collateral");
+        Assert.equal(quantities,[1,2], "There should only be 1 EuriCoin");
+    }
+
+    function testMintIndex() public{
+
     }
 
 }

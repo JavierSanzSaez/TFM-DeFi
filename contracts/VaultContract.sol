@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.O
-pragma solidity ^0.8.0;
+pragma solidity >=0.8.13;
  
 // ERC-20 Interface
 interface ERC20Interface {
@@ -42,12 +42,12 @@ contract SafeMath {
 contract VaultContract is SafeMath{
 
     struct Index{
-        uint id; // The id of the index
-        address[] index_collateral; // Which tokens the index references to
-        uint256[] index_quantities; // How many of each token the index references to
-        }
+        address[] collateral; // Which tokens the index references to
+        uint256[] quantities; // How many of each token the index references to
+    }
 
-    mapping (address => Index[]) public index;
+    mapping (address => Index) index;
+    address[] registered_indexes;
 
     address public masterContract;
 
@@ -63,47 +63,39 @@ contract VaultContract is SafeMath{
         _;
     }
 
-    function redeem_index(address index, address receiver, uint index_amount_to_redeem) public onlyMasterContract{
-        require((index != address(0)) && (receiver != address(0)),"Cannot send the null address as args");
-        require(ERC20Interface(index).balanceOf(receiver)>=index_amount_to_redeem, "Cannot ask for more index that the user already has"); // The ERC-20 token has the accounting of balances, so we call it
-        ERC20Interface(index).transfer(address(this), index_amount_to_redeem);
-        for(uint i = 0; i< index_collateral[index].length;i++){
-            address token = index_collateral[index][i];
-            uint256 quantity = index_quantities[index][i];
+    function get_index(address _index) public returns(Index memory __index) {
+        return index[_index];
+    }
+
+    function redeem_index(address _index, address receiver, uint index_amount_to_redeem) public onlyMasterContract{
+        require((_index != address(0)) && (receiver != address(0)),"Cannot send the null address as args");
+        require(ERC20Interface(_index).balanceOf(receiver)>=index_amount_to_redeem, "Cannot ask for more index that the user already has"); // The ERC-20 token has the accounting of balances, so we call it
+        ERC20Interface(_index).transfer(address(this), index_amount_to_redeem);
+        for(uint i = 0; i< index[_index].collateral.length;i++){
+            address token = index[_index].collateral[i];
+            uint256 quantity = index[_index].quantities[i];
             ERC20Interface(token).transfer(receiver, safeMul(quantity,index_amount_to_redeem));
         }
     }
 
-    function set_collateral(address _index, address[] calldata collateral ) private{
-        require(index != address(0),"Cannot send the null address as args");
-        require(collateral.length > 0, "Cannot send empty array as args");
-        uint256[] storage index_collateral = index[_index].index_collateral;
-        index_collateral = collateral;
+    function register_index(address _index, address[] calldata _collateral, uint256[] calldata _quantities ) public onlyMasterContract{
+        require(_index != address(0),"Cannot send the null address as args");
+        require((_collateral.length > 0) && (_quantities.length > 0), "Cannot send empty array as args");
+        index[_index] = Index({
+            collateral: _collateral,
+            quantities: _quantities
+        });
+
     }
 
-    function set_quantities(address _index, uint256[] calldata quantities ) private{
-        require(index != address(0),"Cannot send the null address as args");
-        require(quantities.length > 0, "Cannot send empty array as args");
-        uint256[] storage index_quantities = index[_index].index_quantities;
-        index_quantities = quantities;
-    }
-
-    function register_index(address index, address[] calldata collateral, uint256[] calldata quantities) public onlyMasterContract{
-        require(index != address(0),"Cannot send the null address as args");
-        require((collateral.length > 0) && (quantities.length > 0), "Cannot send empty array as args");
-
-        set_collateral(index, collateral);
-        set_quantities(index, quantities);
-    }
-
-    function mint_index(address index, address receiver, uint256[] calldata collateral) public onlyMasterContract{
-        require((index != address(0)) && (receiver != address(0)),"Cannot send the null address as args");
-        require(collateral.length > 0, "Cannot send empty array as args");
+    function mint_index(address _index, address receiver, uint256[] calldata _collateral) public onlyMasterContract{
+        require((_index != address(0)) && (receiver != address(0)),"Cannot send the null address as args");
+        require(_collateral.length > 0, "Cannot send empty array as args");
 
         // Since the receiver MUST send the collateral at the exact ratio of collateral, we can safely do the calculations with one of the collateral tokens
-        uint256 registered_collateral = index_quantities[index][0];
-        uint256 index_to_mint = safeDiv(collateral[0], registered_collateral);
-        ERC20Interface(index).transfer(receiver, index_to_mint);
+        uint256 registered_collateral = index[_index].quantities[0];
+        uint256 index_to_mint = safeDiv(_collateral[0], registered_collateral);
+        ERC20Interface(_index).transfer(receiver, index_to_mint);
     }
 
     function setMasterContract(address _masterContract) public onlyMasterContract {
