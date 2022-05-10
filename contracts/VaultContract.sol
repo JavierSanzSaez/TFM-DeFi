@@ -63,7 +63,7 @@ contract VaultContract is SafeMath{
         _;
     }
 
-    function get_index(address _index) public returns(Index memory __index) {
+    function get_index(address _index) public view returns(Index memory __index) {
         return index[_index];
     }
 
@@ -88,14 +88,14 @@ contract VaultContract is SafeMath{
 
     }
 
-    function mint_index(address _index, address receiver, uint256[] calldata _collateral) public onlyMasterContract{
+    function mint_index(address _index, address receiver, uint256[] calldata _collateral) public onlyMasterContract returns(bool result){
         require((_index != address(0)) && (receiver != address(0)),"Cannot send the null address as args");
         require(_collateral.length > 0, "Cannot send empty array as args");
 
         // Since the receiver MUST send the collateral at the exact ratio of collateral, we can safely do the calculations with one of the collateral tokens
         uint256 registered_collateral = index[_index].quantities[0];
         uint256 index_to_mint = safeDiv(_collateral[0], registered_collateral);
-        ERC20Interface(_index).transfer(receiver, index_to_mint);
+        return ERC20Interface(_index).transfer(receiver, index_to_mint);
     }
 
     function setMasterContract(address _masterContract) public onlyMasterContract {
