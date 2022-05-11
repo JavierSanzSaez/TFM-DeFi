@@ -22,27 +22,31 @@ contract StorageContract {
         is_admin[msg.sender] = true;
     }
 
-    function setMasterContract(address _masterContract) public onlyAdmins{
+    // Setters
+    function setMasterContract(address _masterContract) external onlyAdmins{
         masterContract = _masterContract;
     }
-    function setVaultContract(address _vaultContract) public onlyAdmins{
+    function setVaultContract(address _vaultContract) external onlyAdmins{
         vaultContract = _vaultContract;
     }    
-    function setFactoryContract(address _factoryContract) public onlyAdmins{
+    function setFactoryContract(address _factoryContract) external onlyAdmins{
         factoryContract = _factoryContract;
     }
-    function addAdmin(address new_admin) public onlyAdmins{
+    function addAdmin(address new_admin) external onlyAdmins{
         is_admin[new_admin] = true;
     }
-    function checkIfAdmin(address _address) public onlyAdmins view returns(bool _is_admin){
+
+    function checkIfAdmin(address _address) external onlyAdmins view returns(bool _is_admin){
         _is_admin = is_admin[_address]; 
     }
-    function addNewIndex(address _index, address creator) public onlyAdmins{
+
+    function addNewIndex(address _index, address creator) external onlyAdmins{
         indices.push(_index);
         index_creators[_index] = creator;
 
     }
-    function getIndexCreator(address _index) public onlyAdmins view returns(address creator){
+
+    function getIndexCreator(address _index) external onlyAdmins view returns(address creator){
         creator = index_creators[_index];
     }
 }
