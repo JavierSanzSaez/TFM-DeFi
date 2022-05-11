@@ -27,7 +27,6 @@ contract TestVaultContract {
         try vault.register_index(coin_address, deposited_collateral, deposited_quantities){
             Assert.equal(int(0),int(1), "Sending nulls works (and it shouldn't!)");
         } catch{
-            
         }
     }
 
@@ -41,6 +40,7 @@ contract TestVaultContract {
         deposited_quantities[0] = uint256(1);
         deposited_quantities[1] = uint256(2);
 
+        
         vault.register_index(coin_address, deposited_collateral, deposited_quantities);
         address[] memory collateral = vault.get_index(coin_address).collateral;
         uint256[] memory quantities = vault.get_index(coin_address).quantities;
