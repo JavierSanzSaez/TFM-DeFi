@@ -3,7 +3,7 @@ pragma solidity >=0.8.13;
 
 //Safe Math Interface
  
-contract SafeMath_ERC20 {
+abstract contract SafeMath_ERC20 {
  
     function safeAdd(uint a, uint b) public pure returns (uint c) {
         c = a + b;
