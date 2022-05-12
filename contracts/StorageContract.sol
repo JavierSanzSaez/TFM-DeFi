@@ -49,4 +49,8 @@ contract StorageContract {
     function getIndexCreator(address _index) external onlyAdmins view returns(address creator){
         creator = index_creators[_index];
     }
+
+    function getIndicesLength() external onlyAdmins view returns(uint length){
+        return indices.length;
+    }
 }

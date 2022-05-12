@@ -47,18 +47,23 @@ abstract contract StorageContract {
     function addNewIndex(address _index, address creator) virtual external;
     function getIndexCreator(address _index) virtual external view returns(address creator);
     function addAdmin(address new_admin) virtual external;
+    function getIndicesLength() virtual external view returns(uint length);
 
 }
 
 abstract contract FactoryContract {
-    function setMasterContract(address _masterContract) virtual public;
+    function createIndex(string calldata name, string calldata symbol, address creator) virtual external;
 
 }
 
 contract MasterContract is MasterTools{
+
     address public storageContract;
+    StorageContract storageContractInstance;
     address public vaultContract;
+    VaultContract vaultContractInstance;
     address public factoryContract;
+    FactoryContract factoryContractInstance;
     
     mapping (address=>bool) isAdmin;
 
@@ -74,17 +79,20 @@ contract MasterContract is MasterTools{
     function initMasterContract(address _storageContract) external onlyAdmins{
         // We load the addresses of the rest of the contracts
         storageContract = _storageContract;
-        StorageContract storageContInstance = StorageContract(_storageContract);
-        vaultContract = storageContInstance.vaultContract();
-        factoryContract = storageContInstance.factoryContract();
+        storageContractInstance = StorageContract(_storageContract);
+
+        vaultContract = storageContractInstance.vaultContract();
+        vaultContractInstance = VaultContract(vaultContract);
+
+        factoryContract = storageContractInstance.factoryContract();
+        factoryContractInstance = FactoryContract(factoryContract);
     }
 
     function addAdmin(address _admin) external onlyAdmins{
         require(_admin != address(0x0),"Address args cannot be null");
         isAdmin[_admin] = true;
 
-        StorageContract storageContInstance = StorageContract(storageContract);
-        storageContInstance.addAdmin(_admin);
+        storageContractInstance.addAdmin(_admin);
 
     }
 
@@ -98,35 +106,29 @@ contract MasterContract is MasterTools{
     function updateStorageContract (address _storageContract) external onlyAdmins{
         require(_storageContract != address(0x0),"Address args cannot be null");
         storageContract = _storageContract;
+        storageContractInstance = StorageContract(storageContract);
     }
 
     function updateFactoryContract (address _factoryContract) external onlyAdmins{
         require(_factoryContract != address(0x0),"Address args cannot be null");
         factoryContract = _factoryContract;
         
-        StorageContract _storageContract = StorageContract(storageContract);
-        _storageContract.setFactoryContract(_factoryContract);
+        storageContractInstance.setFactoryContract(_factoryContract);
     }    
     
     function updateVaultContract (address _vaultContract) external onlyAdmins{
         require(_vaultContract != address(0x0),"Address args cannot be null");
         vaultContract = _vaultContract;
 
-        StorageContract _storageContract = StorageContract(storageContract);
-        _storageContract.setVaultContract(_vaultContract);
+        storageContractInstance.setVaultContract(_vaultContract);
     }
 
     function setMasterContract(address _masterContract) external onlyAdmins{
         require(_masterContract != address(0x0),"Address args cannot be null");
 
-        VaultContract _vaultContract = VaultContract(vaultContract);
-        _vaultContract.setMasterContract(_masterContract);
-
-        StorageContract _storageContract = StorageContract(storageContract);
-        _storageContract.setMasterContract(_masterContract);
-
-        FactoryContract _factoryContract = FactoryContract(factoryContract);
-        _factoryContract.setMasterContract(_masterContract);
+        vaultContractInstance.setMasterContract(_masterContract);
+        storageContractInstance.setMasterContract(_masterContract);
+        factoryContractInstance.setMasterContract(_masterContract);
     }
 
     // Interacting specifically with the Vault
@@ -136,43 +138,40 @@ contract MasterContract is MasterTools{
         require(_collateral.length!=0,"Array args cannot be null/empty");
         require(checkEmptyInUintArray(_collateral),"Collateral array cannot have an empty token");
 
-        VaultContract _vaultContract = VaultContract(vaultContract);
-        _vaultContract.mint_index(_index, receiver, _collateral);       
+        vaultContractInstance.mint_index(_index, receiver, _collateral);       
     }
 
     function redeem_index(address _index, address receiver, uint index_amount_to_redeem) external{
         require((_index != address(0x0))&&(receiver != address(0x0)),"Address args cannot be null");
         require(index_amount_to_redeem != 0 , "Cannot redeem none index. Maybe you sent decimals without transforming?");
 
-        VaultContract _vaultContract = VaultContract(vaultContract);
-        _vaultContract.redeem_index(_index, receiver, index_amount_to_redeem); 
+        vaultContractInstance.redeem_index(_index, receiver, index_amount_to_redeem); 
     }
 
     // Interacting specifically with the Storage
 
     function getIndexCreator(address _index) public view onlyAdmins returns(address creator) {
-        StorageContract _storageContract = StorageContract(storageContract);
-        return _storageContract.getIndexCreator(_index);
+        require(_index != address(0x0),"Address args cannot be null");
+        return storageContractInstance.getIndexCreator(_index);
     }
 
-    function getAllIndexCreators() external view onlyAdmins{
-        StorageContract _storageContract = StorageContract(storageContract);
-        address[] calldata _indices = _storageContract.indices();
-
+    function getAllIndexCreators() external view onlyAdmins returns(address[] memory _array){
+        uint length = storageContractInstance.getIndicesLength();
+        for (uint index = 0; index < length; index++) {
+            _array[index] = storageContractInstance.indices(index);
+        }
+        return _array;
     }
 
     // Bulk interactions
 
-    function create_index(address _creator, address[] calldata _collateral, uint256[] calldata _quantities) external {
+    function create_index(address _creator, address[] calldata _collateral, uint256[] calldata _quantities, string calldata name, string calldata symbol) external returns(address _index){
         require(_creator != address(0x0),"Address args cannot be null");
         
         require((_collateral.length!=0)&&(_quantities.length!=0),"Array args cannot be null/empty");
         require(checkEmptyInAddressArray(_collateral),"Collateral array cannot have an empty token");
         require(checkEmptyInUintArray(_quantities),"Quantities array cannot have an empty token");
 
-        address _index; // TODO: _index should be the address given by the FactoryContract after calling it
-
-        VaultContract _vaultContract = VaultContract(vaultContract);
-        _vaultContract.register_index(_index, _collateral,_quantities);
+        _index = factoryContractInstance.create_index(name, symbol, _creator);
     }
 }
