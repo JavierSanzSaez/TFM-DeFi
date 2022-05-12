@@ -52,8 +52,9 @@ abstract contract StorageContract {
 }
 
 abstract contract FactoryContract {
-    function createIndex(string calldata name, string calldata symbol, address creator) virtual external;
-
+    function createIndex(string calldata name, string calldata symbol, address creator) virtual external returns(address index);
+    function setStorageContract(address _storageContract) virtual external;
+    function setMasterContract(address _masterContract) virtual external;
 }
 
 contract MasterContract is MasterTools{
@@ -133,12 +134,12 @@ contract MasterContract is MasterTools{
 
     // Interacting specifically with the Vault
 
-    function mint_index(address _index, address receiver, uint256[] calldata _collateral) external {
+    function mint_index(address _index, address receiver, uint256[] calldata _collateral) external  returns(bool result){
         require((_index != address(0x0))&&(receiver != address(0x0)),"Address args cannot be null");
         require(_collateral.length!=0,"Array args cannot be null/empty");
         require(checkEmptyInUintArray(_collateral),"Collateral array cannot have an empty token");
 
-        vaultContractInstance.mint_index(_index, receiver, _collateral);       
+        result =  vaultContractInstance.mint_index(_index, receiver, _collateral);       
     }
 
     function redeem_index(address _index, address receiver, uint index_amount_to_redeem) external{
@@ -172,6 +173,6 @@ contract MasterContract is MasterTools{
         require(checkEmptyInAddressArray(_collateral),"Collateral array cannot have an empty token");
         require(checkEmptyInUintArray(_quantities),"Quantities array cannot have an empty token");
 
-        _index = factoryContractInstance.create_index(name, symbol, _creator);
+        return factoryContractInstance.createIndex(name, symbol, _creator);
     }
 }

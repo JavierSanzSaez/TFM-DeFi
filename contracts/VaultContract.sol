@@ -68,7 +68,6 @@ contract VaultContract is SafeMath{
     }
 
     function redeem_index(address _index, address receiver, uint index_amount_to_redeem) external onlyMasterContract{
-        require((_index != address(0)) && (receiver != address(0)),"Cannot send the null address as args");
         require(ERC20Interface(_index).balanceOf(receiver)>=index_amount_to_redeem, "Cannot ask for more index that the user already has"); // The ERC-20 token has the accounting of balances, so we call it
         ERC20Interface(_index).transfer(address(this), index_amount_to_redeem);
         for(uint i = 0; i< index[_index].collateral.length;i++){
@@ -79,8 +78,6 @@ contract VaultContract is SafeMath{
     }
 
     function register_index(address _index, address[] calldata _collateral, uint256[] calldata _quantities ) external onlyMasterContract{
-        require(_index != address(0),"Cannot send the null address as args");
-        require((_collateral.length > 0) && (_quantities.length > 0), "Cannot send empty array as args");
         index[_index] = Index({
             collateral: _collateral,
             quantities: _quantities
@@ -89,9 +86,6 @@ contract VaultContract is SafeMath{
     }
 
     function mint_index(address _index, address receiver, uint256[] calldata _collateral) external onlyMasterContract returns(bool result){
-        require((_index != address(0)) && (receiver != address(0)),"Cannot send the null address as args");
-        require(_collateral.length > 0, "Cannot send empty array as args");
-
         // Since the receiver MUST send the collateral at the exact ratio of collateral, we can safely do the calculations with one of the collateral tokens
         uint256 registered_collateral = index[_index].quantities[0];
         uint256 index_to_mint = safeDiv(_collateral[0], registered_collateral);
@@ -99,7 +93,6 @@ contract VaultContract is SafeMath{
     }
 
     function setMasterContract(address _masterContract) external onlyMasterContract {
-        require(_masterContract != address(0),"Cannot send the null address as args");
         masterContract = _masterContract;
     }
 
