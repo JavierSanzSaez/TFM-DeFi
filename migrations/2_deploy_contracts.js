@@ -1,8 +1,12 @@
 const VaultContract = artifacts.require("VaultContract")
-const EuriCoin = artifacts.require("EuriCoin")
+const StorageContract = artifacts.require("StorageContract")
+const MasterContract = artifacts.require("MasterContract")
+const FactoryContract = artifacts.require("FactoryContract")
+
 
 module.exports = async function(deployer,network, accounts) {
+  await deployer.deploy(MasterContract, {from: accounts[0]})
+  await deployer.deploy(FactoryContract, {from: accounts[0]})
   await deployer.deploy(VaultContract, {from: accounts[0]})
-  vaultContractInstance = await VaultContract.deployed();
-  deployer.deploy(EuriCoin, vaultContractInstance.address)
+  await deployer.deploy(StorageContract, {from: accounts[0]})
 };
