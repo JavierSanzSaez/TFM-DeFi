@@ -1,0 +1,75 @@
+.App {
+  margin: 10px;
+}
+
+.AppHeader {
+  text-align: center;
+  color: black;
+  font-size: large;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+nav ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-evenly;
+
+}
+
+nav ul li {
+  float: left;
+}
+
+nav ul li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 10px 10px;
+  text-decoration: none;
+}
+
+/* Change the link color to #111 on hover */
+nav ul li a:hover {
+  background-color: #aaa;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+table, th, td {
+  border: 1px solid black;
+}
+
+th, td {
+  padding: 5px;
+  text-align: left;
+}
+
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+.evaluaciones{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-evenly;
+}
+
+.home{
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+}
