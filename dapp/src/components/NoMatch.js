@@ -13,9 +13,9 @@ function NoMatch() {
 
     return (
         <div>
-            <h2>Página no encontrada</h2>
+            <h2>Whoops, page not found</h2>
             <p>
-                <Link to="/">Ir a Home</Link>
+                <Link to="/">Go back</Link>
             </p>
         </div>
     );

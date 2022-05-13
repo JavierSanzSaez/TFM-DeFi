@@ -1,8 +1,6 @@
 import { drizzleReactHooks } from '@drizzle/react-plugin'
 
-import { SoloOwner, SoloCoordinador } from "./checks";
-import { FormCoordinador, FormCerrarAsignatura, FormProfesor, ShowProfesores } from "./home"
-
+import { SoloOwner, SoloCoordinador } from "../checks";
 
 const { useDrizzle } = drizzleReactHooks;
 

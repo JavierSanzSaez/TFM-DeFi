@@ -1,11 +1,8 @@
-
 import { Drizzle } from '@drizzle/store';
+import MasterContract from "../contracts/MasterContract.json";
 
-import Asignatura from './contracts/Asignatura.json'
-
-// Opciones:
 const options = {
-    contracts: [ Asignatura ],
+    contracts: [MasterContract],
     polls: {
         accounts: 3000,
     },
@@ -17,7 +14,6 @@ const options = {
     }
 }
 
-// Crear y exportar el objeto drizzle:
 export default new Drizzle(options);
 
 
