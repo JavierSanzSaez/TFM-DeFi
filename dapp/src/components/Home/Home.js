@@ -3,10 +3,14 @@ import { drizzleReactHooks } from '@drizzle/react-plugin'
 const { useDrizzleState, useDrizzle } = drizzleReactHooks;
 
 const Home = () => {
+
+    console.log("REaching here 1")
     const { useCacheCall } = useDrizzle();
     const drizzleState = useDrizzleState(state => state);
-
-    const allIndexCreators = useCacheCall("MasterContract", "getAllIndexCreators");
+    console.log("REaching here 2")
+    console.log(drizzleState.accounts[0])
+    const allIndexCreators = useCacheCall("MasterContract", "getAllIndexCreators") || 0;
+    console.log("REaching here 3")
 
     return (
         <div className="home">
