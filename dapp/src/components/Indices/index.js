@@ -1,5 +1,7 @@
 import Indices from "./Indices";
+import IndexDetail from "./IndexDetail";
 
-export default {
-    Indices
+export {
+    Indices,
+    IndexDetail
 }

@@ -1,11 +1,9 @@
-import SoloProfesor from "./SoloProfesor"
-import SoloOwner from "./SoloOwner"
-import SoloCoordinador from "./SoloCoordinador"
-import SoloAlumno from "./SoloAlumno"
+import OnlyOwner from "./OnlyOwner"
+import OnlyAdmin from "./OnlyAdmin"
+import OnlyConnected from "./OnlyConnected"
 
 export {
-    SoloProfesor,
-    SoloOwner,
-    SoloCoordinador,
-    SoloAlumno
+    OnlyAdmin,
+    OnlyOwner,
+    OnlyConnected
 }

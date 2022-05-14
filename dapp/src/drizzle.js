@@ -1,5 +1,5 @@
 import { Drizzle } from '@drizzle/store';
-import MasterContract from "../contracts/MasterContract.json";
+import MasterContract from "./contracts/MasterContract.json";
 
 const options = {
     contracts: [MasterContract],

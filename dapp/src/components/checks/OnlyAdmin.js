@@ -1,14 +1,14 @@
 import { drizzleReactHooks } from '@drizzle/react-plugin'
 
-const SoloAlumno = ({ children }) => {
+const OnlyAdmin = ({ children }) => {
     const { useDrizzleState, useDrizzle } = drizzleReactHooks;
     const drizzleState = useDrizzleState(state => state);
     const { useCacheCall } = useDrizzle();
 
-    let isMatriculado = useCacheCall("Asignatura", "estaMatriculado", drizzleState.accounts[0])
+    let isAdmin = useCacheCall("MasterContract", "isAdmin", drizzleState.accounts[0])
 
     return (
-        isMatriculado ?
+        isAdmin ?
             <>
                 {children}
             </>
@@ -18,4 +18,4 @@ const SoloAlumno = ({ children }) => {
 
 };
 
-export default SoloAlumno
+export default OnlyAdmin

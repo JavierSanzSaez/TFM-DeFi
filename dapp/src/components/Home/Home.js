@@ -1,46 +1,24 @@
 import { drizzleReactHooks } from '@drizzle/react-plugin'
 
-import { SoloOwner, SoloCoordinador } from "../checks";
-
-const { useDrizzle } = drizzleReactHooks;
+const { useDrizzleState, useDrizzle } = drizzleReactHooks;
 
 const Home = () => {
     const { useCacheCall } = useDrizzle();
+    const drizzleState = useDrizzleState(state => state);
 
-    const cerrada = useCacheCall("Asignatura", "cerrada");
-
-    const owner = useCacheCall("Asignatura", "owner");
-    const coordinador = useCacheCall("Asignatura", "coordinador");
-
-    const renderCoordinador = coordinador !== "0x0000000000000000000000000000000000000000" ?
-        "Dirección del coordinador de la Asignatura: " + coordinador + "" :
-        "¡No hay coordinador para la asignatura!";
-
-    const statusAsignatura = cerrada ? "cerrada" : "abierta";
-    const statusAsignaturaStyle = {
-        true: "status-cerrada",
-        false: "status-abierta"
-    }
+    const allIndexCreators = useCacheCall("MasterContract", "getAllIndexCreators");
 
     return (
         <div className="home">
-            <div className="home-show-direcciones">
-                <h2>Página Home de la Asignatura</h2>
-                <p>Dirección del usuario owner: {owner}</p>
-                <p>{renderCoordinador}</p>
-            </div>
             <div className="home-soloOwner">
-                <SoloOwner>
-                    <FormCoordinador />
-                    <ShowProfesores />
-                    <FormProfesor />
-                </SoloOwner>
+                {drizzleState.accounts[0]? 
+                <h1>Hi! You are connected with address {drizzleState.accounts[0]} </h1>
+                : 
+                <h1>Hi! You are not connected with MetaMask</h1>
+                }   
             </div>
-            <div className="home-cerrarAsignatura">
-                <p>Esta Asignatura está <span id={statusAsignaturaStyle[cerrada]} >{statusAsignatura}</span></p>
-                <SoloCoordinador>
-                    <FormCerrarAsignatura cerrada={cerrada} />
-                </SoloCoordinador>
+            <div className="home-numberOfIndices">
+                <p>Currently there are {allIndexCreators.length} indices created</p>
             </div>
         </div>
     );
