@@ -69,7 +69,7 @@ contract MasterContract is MasterTools{
     mapping (address=>bool) public isAdmin;
 
     constructor(){
-        isAdmin[msg.sender] = true;
+        isAdmin[address(msg.sender)] = true;
     }
 
     modifier onlyAdmins(){

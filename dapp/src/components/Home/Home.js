@@ -4,13 +4,9 @@ const { useDrizzleState, useDrizzle } = drizzleReactHooks;
 
 const Home = () => {
 
-    console.log("REaching here 1")
     const { useCacheCall } = useDrizzle();
     const drizzleState = useDrizzleState(state => state);
-    console.log("REaching here 2")
-    console.log(drizzleState.accounts[0])
     const allIndexCreators = useCacheCall("MasterContract", "getAllIndexCreators") || 0;
-    console.log("REaching here 3")
 
     return (
         <div className="home">
@@ -22,7 +18,14 @@ const Home = () => {
                 }   
             </div>
             <div className="home-numberOfIndices">
-                <p>Currently there are {allIndexCreators.length} indices created</p>
+                {
+                allIndexCreators.length !== 0 ?
+                    <p>Currently there are {allIndexCreators.length} indices created</p>
+
+                :
+                    <p>There are no Indices created yet.</p>
+                }
+
             </div>
         </div>
     );
