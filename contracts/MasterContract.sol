@@ -66,7 +66,7 @@ contract MasterContract is MasterTools{
     address public factoryContract;
     FactoryContract factoryContractInstance;
     
-    mapping (address=>bool) isAdmin;
+    mapping (address=>bool) public isAdmin;
 
     constructor(){
         isAdmin[msg.sender] = true;

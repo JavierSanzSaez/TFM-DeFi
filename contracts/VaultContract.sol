@@ -16,7 +16,7 @@ interface ERC20Interface {
 
 //Safe Math Interface
  
-contract SafeMath {
+abstract contract SafeMath {
  
     function safeAdd(uint a, uint b) public pure returns (uint c) {
         c = a + b;
