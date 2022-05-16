@@ -29,7 +29,7 @@ contract SafeMath_ERC20 {
  
 //ERC-20 Token Standard Interface
  
-interface ERC20Interface_EuriCoin {
+interface ERC20 {
     function totalSupply() external view returns (uint);
     function balanceOf(address tokenOwner) external view returns (uint balance);
     function allowance(address tokenOwner, address spender) external view returns (uint remaining);
@@ -43,7 +43,7 @@ interface ERC20Interface_EuriCoin {
  
 //Actual token contract
  
-contract EuriCoin is ERC20Interface_EuriCoin, SafeMath_ERC20 {
+contract EuriCoin is ERC20, SafeMath_ERC20 {
     string public symbol;
     string public  name;
     uint8 public decimals;

@@ -1,4 +1,7 @@
 ganache-*
 bin*
 TFM*
-build/contracts/*
+build/contracts
+
+node_modules
+contracts/artifacts

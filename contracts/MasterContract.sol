@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.8.13;
 
+import {FactoryContract} from "./FactoryContract.sol";
+import {VaultContract} from "./VaultContract.sol";
+import {StorageContract} from "./StorageContract.sol";
+
 contract MasterTools{
     function checkEmptyInAddressArray(address[] calldata addressArray) internal pure returns(bool empty){
         for(uint i=0; i<addressArray.length;i++){
@@ -18,43 +22,6 @@ contract MasterTools{
     }
     return true;
     }
-}
-
-abstract contract  VaultContract {
-
-    struct Index{
-        address[] collateral; // Which tokens the index references to
-        uint256[] quantities; // How many of each token the index references to
-    }
-
-    function get_index(address _index) virtual external view returns(Index memory __index);
-    function redeem_index(address _index, address receiver, uint index_amount_to_redeem) virtual external;
-    function register_index(address _index, address[] calldata _collateral, uint256[] calldata _quantities ) virtual external;
-    function mint_index(address _index, address receiver, uint256[] calldata _collateral) virtual external returns(bool result);
-    function setMasterContract(address _masterContract) virtual external;
-
-}
-
-abstract contract StorageContract {
-    address public masterContract;
-    address public vaultContract;
-    address public factoryContract;
-    address[] public indices;
-
-    function setMasterContract(address _masterContract) virtual external;
-    function setVaultContract(address _vaultContract) virtual external;
-    function setFactoryContract(address _factoryContract) virtual external;
-    function addNewIndex(address _index, address creator) virtual external;
-    function getIndexCreator(address _index) virtual external view returns(address creator);
-    function addAdmin(address new_admin) virtual external;
-    function getIndicesLength() virtual external view returns(uint length);
-
-}
-
-abstract contract FactoryContract {
-    function createIndex(string calldata name, string calldata symbol, address creator) virtual external returns(address index);
-    function setStorageContract(address _storageContract) virtual external;
-    function setMasterContract(address _masterContract) virtual external;
 }
 
 contract MasterContract is MasterTools{
@@ -94,7 +61,6 @@ contract MasterContract is MasterTools{
         isAdmin[_admin] = true;
 
         storageContractInstance.addAdmin(_admin);
-
     }
 
     function removeAdmin(address _admin) external onlyAdmins{
@@ -108,6 +74,7 @@ contract MasterContract is MasterTools{
         require(_storageContract != address(0x0),"Address args cannot be null");
         storageContract = _storageContract;
         storageContractInstance = StorageContract(storageContract);
+        factoryContractInstance.setStorageContract(_storageContract);
     }
 
     function updateFactoryContract (address _factoryContract) external onlyAdmins{

@@ -74,7 +74,6 @@ contract VaultContract is SafeMath{
         });
 
     }
-
     function mint_index(address _index, address receiver, uint256[] calldata _collateral) external onlyMasterContract returns(bool result){
         // Since the receiver MUST send the collateral at the exact ratio of collateral, we can safely do the calculations with one of the collateral tokens
         uint256 registered_collateral = index[_index].quantities[0];
