@@ -21,7 +21,7 @@ function App() {
                             <Route index element={<Home/>}/>
                             <Route path="indices" element={<Indices/>}/>
                             <Route path="createIndex" element={<Create/>}/>
-                            <Route path="index/:addr" element={<IndexDetail/>}/>
+                            <Route path="indices/index/:addr" element={<IndexDetail/>}/>
                             <Route path="stats" element={<Stats/>}/>
                             <Route path="*" element={<NoMatch/>}/>
                         </Route>

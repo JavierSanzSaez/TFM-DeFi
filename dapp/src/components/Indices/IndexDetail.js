@@ -1,5 +1,5 @@
-const IndexDetail = () =>{
 
+const IndexDetail = ({}) => {
 }
 
 export default IndexDetail;

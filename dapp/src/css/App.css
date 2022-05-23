@@ -45,11 +45,14 @@ table {
   border-collapse: collapse;
 }
 
-table, th, td {
+table,
+th,
+td {
   border: 1px solid black;
 }
 
-th, td {
+th,
+td {
   padding: 5px;
   text-align: left;
 }
@@ -62,14 +65,36 @@ th {
   background-color: #f2f2f2;
 }
 
-.evaluaciones{
+.evaluaciones {
   display: flex;
   align-items: flex-start;
   justify-content: space-evenly;
 }
 
-.home{
+.home {
 
   align-items: center;
   justify-content: space-evenly;
+}
+
+/* Index Details */
+.indices-body {
+  display: flex;
+  align-content: center;
+}
+
+.index-detail {
+  border-width: 10px;
+  border-color: black;
+  padding: 20px;
+  background-color: rgb(191, 199, 221);
+  border-radius: 20px;
+  margin: auto;
+}
+
+/* Footer */
+
+.AppFooter {
+  float: bottom;
+  position: center;
 }
