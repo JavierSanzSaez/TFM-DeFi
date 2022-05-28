@@ -26,11 +26,11 @@ contract MasterTools{
 
 contract MasterContract is MasterTools{
 
-    address public storageContract;
+    address storageContract;
     StorageContract storageContractInstance;
-    address public vaultContract;
+    address payable vaultContract;
     VaultContract vaultContractInstance;
-    address public factoryContract;
+    address factoryContract;
     FactoryContract factoryContractInstance;
     
     mapping (address=>bool) public isAdmin;
@@ -84,7 +84,7 @@ contract MasterContract is MasterTools{
         storageContractInstance.setFactoryContract(_factoryContract);
     }    
     
-    function updateVaultContract (address _vaultContract) external onlyAdmins{
+    function updateVaultContract (address payable _vaultContract) external onlyAdmins{
         require(_vaultContract != address(0x0),"Address args cannot be null");
         vaultContract = _vaultContract;
 
@@ -94,9 +94,10 @@ contract MasterContract is MasterTools{
     function setMasterContract(address _masterContract) external onlyAdmins{
         require(_masterContract != address(0x0),"Address args cannot be null");
 
-        vaultContractInstance.setMasterContract(_masterContract);
         storageContractInstance.setMasterContract(_masterContract);
-        factoryContractInstance.setMasterContract(_masterContract);
+
+        vaultContractInstance.setMasterContract();
+        factoryContractInstance.setMasterContract();
     }
 
     // Interacting specifically with the Vault

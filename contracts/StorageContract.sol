@@ -3,7 +3,7 @@ pragma solidity >=0.8.13;
 
 contract StorageContract {
     address public masterContract;
-    address public vaultContract;
+    address payable public vaultContract;
     address public factoryContract;
     mapping(address => bool) is_admin;
     mapping(address => address) index_creators;
@@ -25,7 +25,7 @@ contract StorageContract {
     function setMasterContract(address _masterContract) external onlyAdmins{
         masterContract = _masterContract;
     }
-    function setVaultContract(address _vaultContract) external onlyAdmins{
+    function setVaultContract(address payable _vaultContract) external onlyAdmins{
         vaultContract = _vaultContract;
     }    
     function setFactoryContract(address _factoryContract) external onlyAdmins{
@@ -42,7 +42,6 @@ contract StorageContract {
     function addNewIndex(address _index, address creator) external onlyAdmins{
         indices.push(_index);
         index_creators[_index] = creator;
-
     }
 
     function getIndexCreator(address _index) external onlyAdmins view returns(address creator){
@@ -50,6 +49,6 @@ contract StorageContract {
     }
 
     function getIndicesLength() external onlyAdmins view returns(uint length){
-        return indices.length;
+        length = indices.length;
     }
 }

@@ -1,18 +1,8 @@
 // SPDX-License-Identifier: GPL-3.O
 pragma solidity >=0.8.13;
  
-// ERC-20 Interface
-interface ERC20Interface {
-    function totalSupply() external view returns (uint);
-    function balanceOf(address tokenOwner) external view returns (uint balance);
-    function allowance(address tokenOwner, address spender) external view returns (uint remaining);
-    function transfer(address to, uint tokens) external returns (bool success);
-    function approve(address spender, uint tokens) external returns (bool success);
-    function transferFrom(address from, address to, uint tokens) external returns (bool success);
- 
-    event Transfer(address indexed from, address indexed to, uint tokens);
-    event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
-}
+import {IndexContract} from "./IndexContract.sol";
+import {StorageContract} from "./StorageContract.sol";
 
 //Safe Math Interface
  
@@ -28,7 +18,7 @@ abstract contract SafeMath {
         c = a / b;
     }
 }
- 
+
 contract VaultContract is SafeMath{
 
     struct Index{
@@ -40,6 +30,8 @@ contract VaultContract is SafeMath{
     address[] registered_indexes;
 
     address public masterContract;
+    address storageContract;
+    StorageContract storageContractInstance;
 
     constructor(){
         masterContract = msg.sender; // Initially the deployer is the "master contract". We will then change that with "setMasterContract"
@@ -53,17 +45,30 @@ contract VaultContract is SafeMath{
         _;
     }
 
+    function setMasterContract() external onlyMasterContract {
+        masterContract = storageContractInstance.masterContract();
+    }
+
+    function setStorageContract(address _storageContract) external onlyMasterContract {
+        storageContract = _storageContract;
+        storageContractInstance = StorageContract(storageContract);
+    }
+
     function get_index(address _index) external view returns(Index memory __index) {
         return index[_index];
     }
 
     function redeem_index(address _index, address receiver, uint index_amount_to_redeem) external onlyMasterContract{
-        require(ERC20Interface(_index).balanceOf(receiver)>=index_amount_to_redeem, "Cannot ask for more index that the user already has"); // The ERC-20 token has the accounting of balances, so we call it
-        ERC20Interface(_index).transfer(address(this), index_amount_to_redeem);
+        IndexContract index_ = IndexContract(_index);
+        
+        require(IndexContract(_index).balanceOf(receiver)>=index_amount_to_redeem, "Cannot ask for more index that the user already has"); // The ERC-20 token has the accounting of balances, so we call it
+
+        index_.transferFrom(address(this),receiver, index_amount_to_redeem);
+
         for(uint i = 0; i< index[_index].collateral.length;i++){
             address token = index[_index].collateral[i];
             uint256 quantity = index[_index].quantities[i];
-            ERC20Interface(token).transfer(receiver, safeMul(quantity,index_amount_to_redeem));
+            IndexContract(token).transferFrom(address(this),receiver, safeMul(quantity,index_amount_to_redeem));
         }
     }
 
@@ -78,11 +83,7 @@ contract VaultContract is SafeMath{
         // Since the receiver MUST send the collateral at the exact ratio of collateral, we can safely do the calculations with one of the collateral tokens
         uint256 registered_collateral = index[_index].quantities[0];
         uint256 index_to_mint = safeDiv(_collateral[0], registered_collateral);
-        return ERC20Interface(_index).transferFrom(address(this),receiver, index_to_mint);
-    }
-
-    function setMasterContract(address _masterContract) external onlyMasterContract {
-        masterContract = _masterContract;
+        return IndexContract(_index).transferFrom(address(this),receiver, index_to_mint);
     }
 
     receive() external payable {
