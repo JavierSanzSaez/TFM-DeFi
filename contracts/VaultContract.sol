@@ -3,6 +3,8 @@ pragma solidity >=0.8.13;
  
 import {IndexContract} from "./IndexContract.sol";
 import {StorageContract} from "./StorageContract.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
 
 //Safe Math Interface
  
@@ -68,7 +70,7 @@ contract VaultContract is SafeMath{
         for(uint i = 0; i< index[_index].collateral.length;i++){
             address token = index[_index].collateral[i];
             uint256 quantity = index[_index].quantities[i];
-            IndexContract(token).transferFrom(address(this),receiver, safeMul(quantity,index_amount_to_redeem));
+            ERC20(token).transferFrom(address(this),receiver, safeMul(quantity,index_amount_to_redeem));
         }
     }
 
