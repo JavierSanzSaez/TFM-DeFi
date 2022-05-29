@@ -6,32 +6,43 @@ import {StorageContract} from "./StorageContract.sol";
 
 contract FactoryContract{
 
-    address masterContract;
-    address storageContract;
+    address private storageContract;
     StorageContract storageContractInstance;
+    mapping(address => bool) is_admin;
+    address private masterContract;
 
-    constructor(){
-        masterContract = msg.sender; // Initially the deployer is the "master contract". We will then change that with "setMasterContract"
-    }
-
-    modifier onlyMasterContract{
+    modifier onlyAdmins{
         require(
-            msg.sender == masterContract,
-            "Only the Master Contract can interact with me"
+            is_admin[msg.sender],
+            "Factory Contract - Only an Admin can interact with this function"
         );
         _;
+    }    
+
+    constructor(){
+        is_admin[msg.sender] = true;
     }
 
-    function setMasterContract() external onlyMasterContract{
-        masterContract = storageContractInstance.masterContract();
+    function addAdmin(address new_admin) external onlyAdmins{
+        require(new_admin != address(0x0),"Address args cannot be null");
+        is_admin[new_admin] = true;
+    }
+    function removeAdmin(address _admin) external onlyAdmins{
+        require(_admin != address(0x0),"Address args cannot be null");
+        is_admin[_admin] = false;
     }
 
-    function setStorageContract(address _storageContract) external onlyMasterContract {
+    function setMasterContract() external onlyAdmins{
+        address _masterContract = storageContractInstance.masterContract();
+        is_admin[masterContract] = false;
+        is_admin[_masterContract] = true;
+    }
+    function setStorageContract(address _storageContract) external onlyAdmins {
         storageContract = _storageContract;
         storageContractInstance = StorageContract(storageContract);
     }
 
-    function createIndex(string calldata name, string calldata symbol, address creator) external onlyMasterContract returns(address index){
+    function createIndex(string calldata name, string calldata symbol, address creator) external onlyAdmins returns(address index){
         address vault = storageContractInstance.vaultContract();
         IndexContract new_index = new IndexContract(vault, name, symbol);
 

@@ -36,11 +36,11 @@ contract MasterContract is MasterTools{
     mapping (address=>bool) public isAdmin;
 
     constructor(){
-        isAdmin[address(msg.sender)] = true;
+        isAdmin[msg.sender] = true;
     }
 
     modifier onlyAdmins(){
-        require(isAdmin[msg.sender],"Only Admins can execute this function");
+        require(isAdmin[msg.sender],"Master Contract - Only Admins can execute this function");
         _;
     }
 
@@ -142,5 +142,9 @@ contract MasterContract is MasterTools{
         require(checkEmptyInUintArray(_quantities),"Quantities array cannot have an empty token");
 
         return factoryContractInstance.createIndex(name, symbol, _creator);
+    }
+
+    receive() external payable{
+
     }
 }

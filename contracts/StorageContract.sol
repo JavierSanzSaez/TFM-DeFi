@@ -5,14 +5,14 @@ contract StorageContract {
     address public masterContract;
     address payable public vaultContract;
     address public factoryContract;
-    mapping(address => bool) is_admin;
+    mapping(address => bool) public is_admin;
     mapping(address => address) index_creators;
     address[] public indices;
 
     modifier onlyAdmins{
         require(
             is_admin[msg.sender],
-            "Only an Admin can interact with this function"
+            "Storage Contract - Only an Admin can interact with this function"
         );
         _;
     }    
@@ -24,6 +24,8 @@ contract StorageContract {
     // Setters
     function setMasterContract(address _masterContract) external onlyAdmins{
         masterContract = _masterContract;
+        is_admin[masterContract] = false;
+        is_admin[_masterContract] = true;
     }
     function setVaultContract(address payable _vaultContract) external onlyAdmins{
         vaultContract = _vaultContract;
@@ -31,10 +33,15 @@ contract StorageContract {
     function setFactoryContract(address _factoryContract) external onlyAdmins{
         factoryContract = _factoryContract;
     }
+
     function addAdmin(address new_admin) external onlyAdmins{
+        require(new_admin != address(0x0),"Address args cannot be null");
         is_admin[new_admin] = true;
     }
-
+    function removeAdmin(address _admin) external onlyAdmins{
+        require(_admin != address(0x0),"Address args cannot be null");
+        is_admin[_admin] = false;
+    }
     function checkIfAdmin(address _address) external onlyAdmins view returns(bool _is_admin){
         _is_admin = is_admin[_address]; 
     }
