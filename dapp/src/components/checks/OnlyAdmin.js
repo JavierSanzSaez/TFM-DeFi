@@ -9,7 +9,6 @@ const OnlyAdmin = ({ children }) => {
 
     isAdmin = useCacheCall("MasterContract", "isAdmin", drizzleState.accounts[0]);
 
-
     return (
         isAdmin ?
             <>

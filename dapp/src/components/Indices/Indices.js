@@ -1,6 +1,9 @@
+import { drizzleReactHooks } from '@drizzle/react-plugin'
 import IndexCard from "./IndexCard";
 
-const list_indices = [
+const { useDrizzle } = drizzleReactHooks;
+
+const list_indices_template = [
     {
         name: "Test 1",
         symbol: "TEST1",
@@ -19,17 +22,19 @@ const list_indices = [
 ]
 
 const Indices = () => {
+
+    const { useCacheCall } = useDrizzle();
+    const list_indices = useCacheCall("MasterContract", "getAllIndexCreators") || list_indices_template;
+
     let indices_components = []
     for(let i =0; i< list_indices.length;i++ ){
         let index = list_indices[i]
-        console.log(index)
         indices_components.push(
             <IndexCard index_name={index.name} symbol={index.symbol} address={index.address}/>
         )
         
     }
-    console.log(indices_components)
-
+    
     return (
         <div className="indices-main">
             <div className="indices-header">
