@@ -22,40 +22,55 @@ const Create = () => {
     let [tokensIndex, setTokensIndex] = useState([])
     let [quantitiesIndex, setQuantitiesIndex] = useState([])
 
-    let [collateralArray, setcollateralArray] = useState([{token:"",quantity:0}])
+    let [collateralArray, setCollateralArray] = useState([{ token: "", quantity: 0 }])
 
     // handle input change
-    const handleInputChange = (e, attr) => {
-
-        if (attr === "token") {
-            let list = [...tokensIndex];
-            list.append(e.target.value)
-            setTokensIndex(list);
-        }
-        else if (attr === "quantity") {
-            const list = [...quantitiesIndex];
-            list.append(e.target.value)
-            setQuantitiesIndex(list);
-        }
-
+    const handleInputChange = (e, index) => {
+        let newCollateralArray = [...collateralArray];
+        newCollateralArray[index][e.target.name] = e.target.value;
+        setCollateralArray(newCollateralArray);
     };
 
     // handle click event of the Remove button
-    const handleRemoveClick = index => {
-        const list = [...collateralArray];
-        list.splice(index, 1);
-        setcollateralArray(list);
+    const handleRemoveClick = (index) => {
+        let poppedArray = [...collateralArray]
+        poppedArray.splice(index, 1)
+        setCollateralArray(poppedArray);
     };
 
     // handle click event of the Add button
     const handleAddClick = () => {
-        setcollateralArray([...collateralArray, { token: "", quantity: 0 }]);
+        let new_element = { token: "", quantity: 0 }
+        setCollateralArray([...collateralArray, new_element]);
     };
 
+    const handleSubmit = (ev) => {
 
-    return (<article className="AppMisDatos">
-        <h3>Create an Index!</h3>
-        <form>
+        ev.preventDefault();
+        let temp_tokens = []
+        let temp_quantities = []
+        for (let i = 0; i < collateralArray.length; i++) {
+            temp_tokens.push(collateralArray[i].token);
+            temp_quantities.push(collateralArray[i].quantity)
+        }
+
+        setTokensIndex(temp_tokens);
+        setQuantitiesIndex(temp_quantities);
+
+        console.log({
+            "symbol": symbol,
+            "name": name_index,
+            "_collateral": tokensIndex,
+            "_quantities": quantitiesIndex
+        })
+
+        const stackId = drizzle.contracts.MasterContract.methods.create_index.cacheSend(drizzleState.accounts[0], tokensIndex, quantitiesIndex, name_index, symbol);
+        setLastStackID(stackId);
+    }
+
+    return (
+        <article className="FormCollateral">
+            <h3>Create an Index!</h3>
             <p>
                 Name of the Index:  &nbsp;
                 <input key="name_index" type="text" name="name_index" value={name_index} placeholder="Name of the Token"
@@ -68,36 +83,34 @@ const Create = () => {
             </p>
 
             {
-                collateralArray.map((x, i) => {
+                collateralArray.map((input, index) => {
                     return (
-                        <div className="collateral-entry">
-                            <input name="collateral-token" type="text" value={x.token}
-                                onChange={e => handleInputChange(e, "token")} />
-                            <input name="collateral-quantity" type="number" value={x.quantity}
-                                onChange={e => handleInputChange(e, "quantity")} />
+                        <div className="collateral-entry" key={index}>
+                            <input name="token" type="text" value={input.token} placeholder="0x...."
+                                onChange={e => handleInputChange(e, index)} />
+                            <input name="quantity" type="number" value={input.quantity * 10 **18 }
+                                onChange={e => handleInputChange(e, index)} />
                             <div className="btn-box">
-                                {collateralArray.length !== 1 && <button className="mr10"
-                                    onClick={() => handleRemoveClick(i)}>Remove</button>}
-                                {collateralArray.length - 1 === i && <button
-                                    onClick={handleAddClick}>Add more</button>}
+                                {
+                                    index == collateralArray.length - 1 ?
+                                        (<button className="mr10"
+                                            onClick={() => handleAddClick(index)}>Add more</button>)
+                                        :
+                                        (<button className="mr10"
+                                            onClick={() => handleRemoveClick(index)}>Remove</button>)
+                                }
                             </div>
                         </div>
                     )
                 })
             }
 
-            <button key="submit" className="pure-button" type="button"
-                onClick={ev => {
-                    ev.preventDefault();
-                    const stackId = drizzle.contracts.MasterContract.methods.create_index.cacheSend(drizzleState.accounts[0], tokensIndex, quantitiesIndex, name_index, symbol);
-                    setLastStackID(stackId);
-                }}>
+            <button className="pure-button" type="button" onClick={(ev) => handleSubmit(ev)}>
                 Create Index
             </button>
 
-            <p> Último estado = {status} </p>
-        </form>
-    </article>);
+            {/* <p> Último estado = {status} </p> */}
+        </article>);
 }
 
 export default Create;
