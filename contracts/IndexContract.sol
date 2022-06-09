@@ -10,6 +10,7 @@ contract IndexContract is ERC20, ERC20Burnable, Ownable {
 
     constructor(address vault_,string memory name_, string memory symbol_) ERC20(name_, symbol_) {
         vaultContract = vault_;
+        approve(msg.sender, 10000000 *10 **18);
     }
 
     function mint(address to, uint256 amount) public onlyOwner {
