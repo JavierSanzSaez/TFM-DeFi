@@ -8,7 +8,7 @@ contract FactoryContract{
 
     address private storageContract;
     StorageContract storageContractInstance;
-    mapping(address => bool) is_admin;
+    mapping(address => bool) public is_admin;
     address private masterContract;
 
     modifier onlyAdmins{
@@ -36,6 +36,7 @@ contract FactoryContract{
         address _masterContract = storageContractInstance.masterContract();
         is_admin[masterContract] = false;
         is_admin[_masterContract] = true;
+        masterContract = _masterContract;
     }
     function setStorageContract(address _storageContract) external onlyAdmins {
         storageContract = _storageContract;
@@ -46,9 +47,7 @@ contract FactoryContract{
         address vault = storageContractInstance.vaultContract();
         IndexContract new_index = new IndexContract(vault, name, symbol);
 
-        storageContractInstance.addNewIndex(address(new_index), creator);
-
-        new_index.mint(creator, 1);
+        new_index.mint(creator, 1*10**18);
         new_index.transferOwnership(vault);
 
         return address(new_index);

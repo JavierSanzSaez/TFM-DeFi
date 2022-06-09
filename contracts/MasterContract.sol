@@ -4,6 +4,8 @@ pragma solidity >=0.8.13;
 import {FactoryContract} from "./FactoryContract.sol";
 import {VaultContract} from "./VaultContract.sol";
 import {StorageContract} from "./StorageContract.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
 
 contract MasterTools{
     function checkEmptyInAddressArray(address[] calldata addressArray) internal pure returns(bool empty){
@@ -134,14 +136,22 @@ contract MasterContract is MasterTools{
 
     // Bulk interactions
 
-    function create_index(address _creator, address[] calldata _collateral, uint256[] calldata _quantities, string calldata name, string calldata symbol) external returns(address _index){
+    function create_index(address _creator, address[] calldata _collateral, uint256[] calldata _quantities, string calldata name, string calldata symbol) external returns(address new_index){
         require(_creator != address(0x0),"Address args cannot be null");
         
         require((_collateral.length!=0)&&(_quantities.length!=0),"Array args cannot be null/empty");
         require(checkEmptyInAddressArray(_collateral),"Collateral array cannot have an empty token");
         require(checkEmptyInUintArray(_quantities),"Quantities array cannot have an empty token");
 
-        return factoryContractInstance.createIndex(name, symbol, _creator);
+        new_index = factoryContractInstance.createIndex(name, symbol, _creator);
+        
+        storageContractInstance.addNewIndex(new_index, _creator);
+        vaultContractInstance.register_index(new_index,  _collateral, _quantities);
+        vaultContractInstance.receive_collateral(_collateral, _quantities,_creator);
+    }
+
+    function approve(address _token) external{
+        
     }
 
     receive() external payable{
