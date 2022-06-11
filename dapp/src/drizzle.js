@@ -1,9 +1,10 @@
 import { Drizzle } from '@drizzle/store';
 import MasterContract from "./contracts/MasterContract.json";
 import StorageContract from "./contracts/StorageContract.json";
+import ERC20 from "./contracts/ERC20.json";
 
 const options = {
-    contracts: [MasterContract, StorageContract],
+    contracts: [MasterContract, StorageContract], ERC20,
     polls: {
         accounts: 3000,
     },

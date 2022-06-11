@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { drizzleReactHooks } from '@drizzle/react-plugin'
+var Web3 = require('web3')
 
 const { useDrizzleState, useDrizzle } = drizzleReactHooks;
 
@@ -22,7 +23,7 @@ const Create = () => {
     let [tokensIndex, setTokensIndex] = useState([])
     let [quantitiesIndex, setQuantitiesIndex] = useState([])
 
-    let [collateralArray, setCollateralArray] = useState([{ token: "", quantity: 0 }])
+    let [collateralArray, setCollateralArray] = useState([{ token: "", quantity: 0, approved: false }])
 
     // handle input change
     const handleInputChange = (e, index) => {
@@ -40,7 +41,7 @@ const Create = () => {
 
     // handle click event of the Add button
     const handleAddClick = () => {
-        let new_element = { token: "", quantity: 0 }
+        let new_element = { token: "", quantity: 0, approved: false }
         setCollateralArray([...collateralArray, new_element]);
     };
 
@@ -51,7 +52,7 @@ const Create = () => {
         let temp_quantities = []
         for (let i = 0; i < collateralArray.length; i++) {
             temp_tokens.push(collateralArray[i].token);
-            temp_quantities.push(collateralArray[i].quantity)
+            temp_quantities.push(collateralArray[i].quantity * 10 ** 18)
         }
 
         setTokensIndex(temp_tokens);
@@ -66,6 +67,30 @@ const Create = () => {
 
         const stackId = drizzle.contracts.MasterContract.methods.create_index.cacheSend(drizzleState.accounts[0], tokensIndex, quantitiesIndex, name_index, symbol);
         setLastStackID(stackId);
+    }
+
+    const onHandleApproveToken = (token_address, index) => {
+
+        let web3 = new Web3(new Web3.providers.HttpProvider("http://127.0.0.1:8545"))
+        web3.eth.getBalance("")
+        .then(function(result){
+            console.log(result)
+        })
+        let json_contract = require("../../contracts/ERC20.json")
+
+        let web3Contract = new web3.eth.Contract(json_contract.abi, token_address)
+
+        let masterContract = drizzle.contracts['MasterContract'].address
+        let storageContract = drizzle.contracts['StorageContract'].address
+
+        web3Contract.methods.approve(masterContract, 10000000).send({from:drizzleState.accounts[0]})
+        .on(
+            'receipt', function(){
+                    let newCollateralArray = [...collateralArray];
+                    newCollateralArray[index].approved = true;
+                    setCollateralArray(newCollateralArray);
+            }
+            )
     }
 
     return (
@@ -88,7 +113,7 @@ const Create = () => {
                         <div className="collateral-entry" key={index}>
                             <input name="token" type="text" value={input.token} placeholder="0x...."
                                 onChange={e => handleInputChange(e, index)} />
-                            <input name="quantity" type="number" value={input.quantity * 10 **18 }
+                            <input name="quantity" type="number" value={input.quantity}
                                 onChange={e => handleInputChange(e, index)} />
                             <div className="btn-box">
                                 {
@@ -100,6 +125,15 @@ const Create = () => {
                                             onClick={() => handleRemoveClick(index)}>Remove</button>)
                                 }
                             </div>
+
+                            {!input.approved && input.token.length == 42 ?
+                                <button onClick={() => onHandleApproveToken(input.token, index)}>
+                                    Approve token
+                                </button>
+                                :
+                                <></>
+                            }
+
                         </div>
                     )
                 })

@@ -151,7 +151,8 @@ contract MasterContract is MasterTools{
     }
 
     function approve(address _token) external{
-        
+        ERC20(_token).approve(address(this), 10000000*10**18);
+        ERC20(_token).approve(vaultContract, 10000000*10**18);
     }
 
     receive() external payable{
