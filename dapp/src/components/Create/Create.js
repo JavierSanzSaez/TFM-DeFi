@@ -20,8 +20,6 @@ const Create = () => {
     // Conservar los valores metidos en el formulario
     let [name_index, setName_index] = useState("")
     let [symbol, setSymbol] = useState("")
-    let [tokensIndex, setTokensIndex] = useState([])
-    let [quantitiesIndex, setQuantitiesIndex] = useState([])
 
     let [collateralArray, setCollateralArray] = useState([{ token: "", quantity: 0, approved: false }])
 
@@ -52,45 +50,45 @@ const Create = () => {
         let temp_quantities = []
         for (let i = 0; i < collateralArray.length; i++) {
             temp_tokens.push(collateralArray[i].token);
-            temp_quantities.push(collateralArray[i].quantity * 10 ** 18)
+            temp_quantities.push(collateralArray[i].quantity)
         }
 
-        setTokensIndex(temp_tokens);
-        setQuantitiesIndex(temp_quantities);
+        drizzle.contracts.MasterContract.methods.create_index(drizzleState.accounts[0], temp_tokens, temp_quantities, name_index, symbol).send()
+            .then(
+                (result) => {
+                    console.log(result)
 
-        console.log({
-            "symbol": symbol,
-            "name": name_index,
-            "_collateral": tokensIndex,
-            "_quantities": quantitiesIndex
-        })
+                }
+            )
 
-        const stackId = drizzle.contracts.MasterContract.methods.create_index.cacheSend(drizzleState.accounts[0], tokensIndex, quantitiesIndex, name_index, symbol);
-        setLastStackID(stackId);
     }
 
     const onHandleApproveToken = (token_address, index) => {
 
-        let web3 = new Web3(new Web3.providers.HttpProvider("http://127.0.0.1:8545"))
-        web3.eth.getBalance("")
-        .then(function(result){
-            console.log(result)
-        })
-        let json_contract = require("../../contracts/ERC20.json")
+        try {
+            let web3 = new Web3(new Web3.providers.HttpProvider("http://127.0.0.1:8545"))
+            let json_contract = require("../../contracts/ERC20.json")
 
-        let web3Contract = new web3.eth.Contract(json_contract.abi, token_address)
-
-        let masterContract = drizzle.contracts['MasterContract'].address
-        let storageContract = drizzle.contracts['StorageContract'].address
-
-        web3Contract.methods.approve(masterContract, 10000000).send({from:drizzleState.accounts[0]})
-        .on(
-            'receipt', function(){
-                    let newCollateralArray = [...collateralArray];
-                    newCollateralArray[index].approved = true;
-                    setCollateralArray(newCollateralArray);
+            var contractConfig = {
+                contractName: token_address,
+                web3Contract: new web3.eth.Contract(json_contract.abi, token_address)
             }
+
+            // Or using the Drizzle context object
+            drizzle.addContract(contractConfig, [])
+        }
+        catch {
+
+        }
+
+        drizzle.contracts.StorageContract.methods.vaultContract().call()
+            .then(
+                (vaultContract) => {
+                    drizzle.contracts[token_address].methods.approve(vaultContract, 10000000).send({ from: drizzleState.accounts[0] })
+                }
             )
+        collateralArray[index].approved = true
+        console.log("Approval successful")
     }
 
     return (
@@ -117,7 +115,7 @@ const Create = () => {
                                 onChange={e => handleInputChange(e, index)} />
                             <div className="btn-box">
                                 {
-                                    index == collateralArray.length - 1 ?
+                                    index === collateralArray.length - 1 ?
                                         (<button className="mr10"
                                             onClick={() => handleAddClick(index)}>Add more</button>)
                                         :
@@ -126,7 +124,7 @@ const Create = () => {
                                 }
                             </div>
 
-                            {!input.approved && input.token.length == 42 ?
+                            {!input.approved && input.token.length === 42 ?
                                 <button onClick={() => onHandleApproveToken(input.token, index)}>
                                     Approve token
                                 </button>
@@ -143,7 +141,7 @@ const Create = () => {
                 Create Index
             </button>
 
-            {/* <p> Último estado = {status} </p> */}
+            <p> Último estado = {status} </p>
         </article>);
 }
 
