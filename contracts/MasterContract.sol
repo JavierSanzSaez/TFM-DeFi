@@ -34,6 +34,10 @@ contract MasterContract is MasterTools{
     VaultContract vaultContractInstance;
     address factoryContract;
     FactoryContract factoryContractInstance;
+
+    event IndexCreated(
+        address indexed index_address
+    );
     
     mapping (address=>bool) public isAdmin;
 
@@ -104,12 +108,12 @@ contract MasterContract is MasterTools{
 
     // Interacting specifically with the Vault
 
-    function mint_index(address _index, address receiver, uint256[] calldata _collateral) external  returns(bool result){
+    function mint_index(address _index, address receiver, uint256[] calldata _collateral) external{
         require((_index != address(0x0))&&(receiver != address(0x0)),"Address args cannot be null");
         require(_collateral.length!=0,"Array args cannot be null/empty");
         require(checkEmptyInUintArray(_collateral),"Collateral array cannot have an empty token");
 
-        result =  vaultContractInstance.mint_index(_index, receiver, _collateral);       
+        vaultContractInstance.mint_index(_index, receiver, _collateral);       
     }
 
     function redeem_index(address _index, address receiver, uint index_amount_to_redeem) external{
@@ -136,18 +140,20 @@ contract MasterContract is MasterTools{
 
     // Bulk interactions
 
-    function create_index(address _creator, address[] calldata _collateral, uint256[] calldata _quantities, string calldata name, string calldata symbol) external returns(address new_index){
+    function create_index(address _creator, address[] calldata _collateral, uint256[] calldata _quantities, string calldata name, string calldata symbol) external{
         require(_creator != address(0x0),"Address args cannot be null");
         
         require((_collateral.length!=0)&&(_quantities.length!=0),"Array args cannot be null/empty");
         require(checkEmptyInAddressArray(_collateral),"Collateral array cannot have an empty token");
         require(checkEmptyInUintArray(_quantities),"Quantities array cannot have an empty token");
 
-        new_index = factoryContractInstance.createIndex(name, symbol, _creator);
+        address new_index = factoryContractInstance.createIndex(name, symbol, _creator);
         
         storageContractInstance.addNewIndex(new_index, _creator);
         vaultContractInstance.register_index(new_index,  _collateral, _quantities);
         vaultContractInstance.receive_collateral(_collateral, _quantities,_creator);
+
+        emit IndexCreated(new_index);
     }
 
     function approve(address _token) external{

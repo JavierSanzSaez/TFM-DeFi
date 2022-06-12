@@ -98,11 +98,11 @@ contract VaultContract{
         }
     }
 
-    function mint_index(address _index, address receiver, uint256[] calldata _collateral) external onlyAdmins returns(bool result){
+    function mint_index(address _index, address receiver, uint256[] calldata _collateral) external onlyAdmins{
         // Since the receiver MUST send the collateral at the exact ratio of collateral, we can safely do the calculations with one of the collateral tokens
         uint256 registered_collateral = index[_index].quantities[0];
         uint256 index_to_mint = safeDiv(_collateral[0], registered_collateral);
-        return IndexContract(_index).transferFrom(address(this),receiver, index_to_mint);
+        IndexContract(_index).mint(receiver, index_to_mint *10 **18);
     }
 
     receive() external payable {
