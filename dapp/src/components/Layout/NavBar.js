@@ -8,7 +8,7 @@ const NavBar = () => (
             <li><Link to="/indices/">See Indices</Link></li>
             <li><Link to="/createIndex/">Create an Index!</Link></li>
             <OnlyAdmin>
-                <li><Link to="/stats/">See Stats</Link></li>
+                <li><Link to="/adminpanel/">Admin Panel</Link></li>
             </OnlyAdmin>
         </ul>
     </nav>

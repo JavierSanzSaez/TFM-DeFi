@@ -9,7 +9,7 @@ import {IndexDetail, Indices} from "./Indices"
 import { Create } from "./Create";
 
 import NoMatch from './NoMatch';
-import { Stats } from "./Stats";
+import { AdminPanel } from "./AdminPanel";
 
 function App() {
     return (
@@ -22,7 +22,7 @@ function App() {
                             <Route path="indices" element={<Indices/>}/>
                             <Route path="createIndex" element={<Create/>}/>
                             <Route path="indices/index/:addr" element={<IndexDetail/>}/>
-                            <Route path="stats" element={<Stats/>}/>
+                            <Route path="adminpanel" element={<AdminPanel/>}/>
                             <Route path="*" element={<NoMatch/>}/>
                         </Route>
                     </Routes>
