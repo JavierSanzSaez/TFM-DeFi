@@ -5,3 +5,4 @@ build/contracts
 
 node_modules
 contracts/artifacts
+package-lock.json
