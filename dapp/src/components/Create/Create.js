@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { drizzleReactHooks } from '@drizzle/react-plugin'
+import { Link } from "react-router-dom";
+
 var Web3 = require('web3')
 
 const { useDrizzleState, useDrizzle } = drizzleReactHooks;
@@ -8,20 +10,14 @@ const Create = () => {
     const { drizzle } = useDrizzle();
     const drizzleState = useDrizzleState(state => state);
 
-    // Obtener el status de la ultima transaccion enviada:
-    const { transactionStack, transactions } = useDrizzleState(drizzleState => ({
-        transactionStack: drizzleState.transactionStack,
-        transactions: drizzleState.transactions
-    }));
-    const [lastStackID, setLastStackID] = useState(undefined)
-    const txObject = transactions[transactionStack[lastStackID] || 'undefined'];
-    const status = txObject?.status;
-
     // Conservar los valores metidos en el formulario
     let [name_index, setName_index] = useState("")
     let [symbol, setSymbol] = useState("")
 
     let [collateralArray, setCollateralArray] = useState([{ token: "", quantity: 0, approved: false }])
+
+    let [index_created, setIndex_created] = useState(false)
+    let [new_index_address, setNew_index_address] = useState("")
 
     // handle input change
     const handleInputChange = (e, index) => {
@@ -57,7 +53,13 @@ const Create = () => {
             .then(
                 (result) => {
                     console.log(result)
-
+                    if (result.events.IndexCreated.returnValues.index_address) {
+                        setNew_index_address(result.events.IndexCreated.returnValues.index_address)
+                        setIndex_created(true)
+                    }
+                    else {
+                        setIndex_created(false)
+                    }
                 }
             )
 
@@ -85,63 +87,106 @@ const Create = () => {
             .then(
                 (vaultContract) => {
                     drizzle.contracts[token_address].methods.approve(vaultContract, 10000000).send({ from: drizzleState.accounts[0] })
+                        .then(
+                            (result) => {
+                                collateralArray[index].approved = true
+                                console.log("Approval successful")
+                                console.log(result)
+                            }
+                        )
+
                 }
             )
-        collateralArray[index].approved = true
-        console.log("Approval successful")
+
     }
 
     return (
         <article className="FormCollateral">
-            <h3>Create an Index!</h3>
-            <p>
-                Name of the Index:  &nbsp;
-                <input key="name_index" type="text" name="name_index" value={name_index} placeholder="Name of the Token"
-                    onChange={ev => setName_index(ev.target.value)} />
-            </p>
-            <p>
-                Symbol:  &nbsp;
-                <input key="symbol" type="text" name="symbol" value={symbol} placeholder="Symbol"
-                    onChange={ev => setSymbol(ev.target.value)} />
-            </p>
+            {!index_created ? <>
+                <h3>Create an Index!</h3>
+                <p>
+                    Name of the Index:  &nbsp;
+                    <input key="name_index" type="text" name="name_index" value={name_index} placeholder="Name of the Token"
+                        onChange={ev => setName_index(ev.target.value)} />
+                </p>
+                <p>
+                    Symbol:  &nbsp;
+                    <input key="symbol" type="text" name="symbol" value={symbol} placeholder="Symbol"
+                        onChange={ev => setSymbol(ev.target.value)} />
+                </p>
 
-            {
-                collateralArray.map((input, index) => {
-                    return (
-                        <div className="collateral-entry" key={index}>
-                            <input name="token" type="text" value={input.token} placeholder="0x...."
-                                onChange={e => handleInputChange(e, index)} />
-                            <input name="quantity" type="number" value={input.quantity}
-                                onChange={e => handleInputChange(e, index)} />
-                            <div className="btn-box">
-                                {
-                                    index === collateralArray.length - 1 ?
-                                        (<button className="mr10"
-                                            onClick={() => handleAddClick(index)}>Add more</button>)
-                                        :
-                                        (<button className="mr10"
-                                            onClick={() => handleRemoveClick(index)}>Remove</button>)
+                {
+                    collateralArray.map((input, index) => {
+                        return (
+                            <div className="collateral-entry" key={index}>
+                                <input name="token" type="text" value={input.token} placeholder="0x...."
+                                    onChange={e => handleInputChange(e, index)} />
+                                <input name="quantity" type="number" value={input.quantity}
+                                    onChange={e => handleInputChange(e, index)} />
+                                <div className="btn-box">
+                                    {
+                                        index === collateralArray.length - 1 ?
+                                            (<button className="mr10"
+                                                onClick={() => handleAddClick(index)}>Add more</button>)
+                                            :
+                                            (<button className="mr10"
+                                                onClick={() => handleRemoveClick(index)}>Remove</button>)
+                                    }
+                                </div>
+
+                                {!input.approved && input.token.length === 42 ?
+                                    <button onClick={() => onHandleApproveToken(input.token, index)}>
+                                        Approve token
+                                    </button>
+                                    :
+                                    <></>
                                 }
+
                             </div>
+                        )
+                    })
+                }
 
-                            {!input.approved && input.token.length === 42 ?
-                                <button onClick={() => onHandleApproveToken(input.token, index)}>
-                                    Approve token
-                                </button>
-                                :
-                                <></>
+                <button className="pure-button" type="button" onClick={(ev) => handleSubmit(ev)}>
+                    Create Index
+                </button>
+            </>
+                :
+                <>
+                    <h3>Congrats!</h3>
+                    <p>You are now the proud creator of a new Index Token! Now you are ready to mint more or trade with your index in the usual DEXes!</p>
+                    <p>Details about your new Index:</p>
+                    <ul>
+                        <li><p>Name: {name_index}</p></li>
+                        <li><p>Symbol: {symbol}</p></li>
+                        <li><p>Address: {new_index_address}</p></li>
+                        <li><p>Underlying collateral:</p></li>
+                        <ul>
+                            {
+                                collateralArray.map(
+                                    (input, index) => {
+                                        return (
+                                            <li>{input.quantity} units of token {input.token}</li>
+                                        )
+                                    }
+                                )
                             }
+                        </ul>
+                    </ul>
+                    <div className="IndexButtonOptions">
+                        <button>
+                            <Link to="/">Go to the Main Page</Link>
+                        </button>
+                        <p>Or</p>
+                        <button>
+                            <Link to={`indices/index/${new_index_address}`}>Go to your Index Page</Link>
+                        </button>
+                    </div>
 
-                        </div>
-                    )
-                })
+                </>
+
             }
 
-            <button className="pure-button" type="button" onClick={(ev) => handleSubmit(ev)}>
-                Create Index
-            </button>
-
-            <p> Último estado = {status} </p>
         </article>);
 }
 
