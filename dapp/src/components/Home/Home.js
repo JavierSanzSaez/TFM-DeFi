@@ -7,14 +7,19 @@ const Home = () => {
     const { useCacheCall } = useDrizzle();
     const drizzleState = useDrizzleState(state => state);
     const allIndexCreators = useCacheCall("MasterContract", "getAllIndexCreators") || [];
-    console.log(allIndexCreators);
     return (
         <div className="home">
-            <div className="home-soloOwner">
+            <h1>
+                Create your index with just three clicks!
+            </h1>
+            <p>
+                Every index created is ERC20-compliant, so you can use it in any popular DEX!
+            </p>
+            <div className="home-address-connected">
                 {drizzleState.accounts[0]? 
-                <h1>Hi! You are connected with address {drizzleState.accounts[0]} </h1>
+                <h3>Hi! You are connected with address {drizzleState.accounts[0]} </h3>
                 : 
-                <h1>Hi! You are not connected with MetaMask</h1>
+                <p>Hi! You are not connected with MetaMask</p>
                 }   
             </div>
             <div className="home-numberOfIndices">

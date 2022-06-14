@@ -25,12 +25,12 @@ const Indices = () => {
 
     const { useCacheCall } = useDrizzle();
     const list_indices = useCacheCall("MasterContract", "getAllIndexCreators") || list_indices_template;
-
+    console.log(list_indices)
     let indices_components = []
     for(let i =0; i< list_indices.length;i++ ){
         let index = list_indices[i]
         indices_components.push(
-            <IndexCard index_name={index.name} symbol={index.symbol} address={index.address}/>
+            <IndexCard index_name={index.name} symbol={index.symbol} address={index}/>
         )
         
     }

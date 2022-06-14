@@ -1,7 +1,7 @@
 const Footer = () => {
     return (
             <footer className="AppFooter">
-                <p>
+                <p className="author">
                     Author:  Javier Sanz Sáez
                 </p>
             </footer>
