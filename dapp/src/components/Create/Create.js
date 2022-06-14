@@ -89,6 +89,7 @@ const Create = () => {
                     drizzle.contracts[token_address].methods.approve(vaultContract, 10000000).send({ from: drizzleState.accounts[0] })
                         .then(
                             (result) => {
+                                let stackID = drizzle.contracts.VaultContract.methods.approve(token_address, drizzleState.accounts[0]).call()
                                 collateralArray[index].approved = true
                                 console.log("Approval successful")
                                 console.log(result)
