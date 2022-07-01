@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 
 const IndexCard = ({ index_name, symbol, address }) => {
-
     let link = "index/" + address
     return (
         <div className="index-detail">

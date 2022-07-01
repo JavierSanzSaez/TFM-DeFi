@@ -62,18 +62,6 @@ th {
   background-color: #f2f2f2;
 }
 
-.evaluaciones {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-evenly;
-}
-
-.home {
-
-  align-items: center;
-  justify-content: space-evenly;
-}
-
 /* Index Details */
 .indices-body {
   display: flex;
@@ -109,17 +97,19 @@ html{
 
 /* App Body */
 
-
 .home{
   display: flex;
   flex-direction: column;
-  height: 100%;
+  align-items: center;
 }
 .home-numberOfIndices{
   flex: 1 1 auto;
 }
-.App{
 
+.app-body{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 html{
