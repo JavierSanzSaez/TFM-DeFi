@@ -86,14 +86,14 @@ contract MasterContract is MasterTools{
     function updateFactoryContract (address _factoryContract) external onlyAdmins{
         require(_factoryContract != address(0x0),"Address args cannot be null");
         factoryContract = _factoryContract;
-        
+        factoryContractInstance = FactoryContract(factoryContract);
         storageContractInstance.setFactoryContract(_factoryContract);
     }    
     
     function updateVaultContract (address payable _vaultContract) external onlyAdmins{
         require(_vaultContract != address(0x0),"Address args cannot be null");
         vaultContract = _vaultContract;
-
+        vaultContractInstance = VaultContract(vaultContract);
         storageContractInstance.setVaultContract(_vaultContract);
     }
 
@@ -130,8 +130,9 @@ contract MasterContract is MasterTools{
         return storageContractInstance.getIndexCreator(_index);
     }
 
-    function getAllIndexCreators() external view onlyAdmins returns(address[] memory _array){
+    function getAllIndexCreators() external view onlyAdmins returns(address[] memory){
         uint length = storageContractInstance.getIndicesLength();
+        address[] memory _array = new address[](length);
         for (uint index = 0; index < length; index++) {
             _array[index] = storageContractInstance.indices(index);
         }
@@ -140,18 +141,19 @@ contract MasterContract is MasterTools{
 
     // Bulk interactions
 
-    function create_index(address _creator, address[] calldata _collateral, uint256[] calldata _quantities, string calldata name, string calldata symbol) external{
+    function create_index(address _creator, address[] calldata _collateral, uint256[] calldata _quantities, string calldata name, string calldata symbol) external returns (address new_index){
         require(_creator != address(0x0),"Address args cannot be null");
         
         require((_collateral.length!=0)&&(_quantities.length!=0),"Array args cannot be null/empty");
         require(checkEmptyInAddressArray(_collateral),"Collateral array cannot have an empty token");
         require(checkEmptyInUintArray(_quantities),"Quantities array cannot have an empty token");
 
-        address new_index = factoryContractInstance.createIndex(name, symbol, _creator);
+        new_index = factoryContractInstance.createIndex(name, symbol, _creator);
         
         storageContractInstance.addNewIndex(new_index, _creator);
         vaultContractInstance.register_index(new_index,  _collateral, _quantities);
         vaultContractInstance.receive_collateral(_collateral, _quantities,_creator);
+        vaultContractInstance.approve(new_index, _creator);
 
         emit IndexCreated(new_index);
     }

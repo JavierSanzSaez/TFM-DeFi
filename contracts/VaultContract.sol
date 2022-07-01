@@ -76,12 +76,13 @@ contract VaultContract{
         
         require(IndexContract(_index).balanceOf(receiver)>=index_amount_to_redeem, "Cannot ask for more index that the user already has"); // The ERC-20 token has the accounting of balances, so we call it
 
-        index_.transferFrom(address(this),receiver, index_amount_to_redeem);
+        index_.transferFrom(receiver,address(this), index_amount_to_redeem);
+        index_.burn(index_amount_to_redeem);
 
         for(uint i = 0; i< index[_index].collateral.length;i++){
             address token = index[_index].collateral[i];
             uint256 quantity = index[_index].quantities[i];
-            ERC20(token).transferFrom(address(this),receiver, safeMul(quantity,index_amount_to_redeem));
+            ERC20(token).transfer(receiver, safeMul(quantity,index_amount_to_redeem));
         }
     }
 
@@ -103,6 +104,10 @@ contract VaultContract{
         uint256 registered_collateral = index[_index].quantities[0];
         uint256 index_to_mint = safeDiv(_collateral[0], registered_collateral);
         IndexContract(_index).mint(receiver, index_to_mint *10 **18);
+    }
+
+    function approve(address token, address receiver) external {
+        ERC20(token).approve(receiver, 100*10**18);
     }
 
     receive() external payable {
