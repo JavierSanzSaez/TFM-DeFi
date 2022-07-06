@@ -74,7 +74,14 @@ th {
   padding: 20px;
   background-color: rgb(191, 199, 221);
   border-radius: 20px;
-  margin: auto;
+  margin: 10px;
+}
+
+.indices-header{
+  text-align: center;
+}
+.index-detail-title{
+  text-align: center;
 }
 
 /* Footer */
