@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { drizzleReactHooks } from '@drizzle/react-plugin'
 import { Link } from "react-router-dom";
+import {ethers} from "ethers"
 
 var Web3 = require('web3')
 
@@ -46,7 +47,7 @@ const Create = () => {
         let temp_quantities = []
         for (let i = 0; i < collateralArray.length; i++) {
             temp_tokens.push(collateralArray[i].token);
-            temp_quantities.push(collateralArray[i].quantity)
+            temp_quantities.push(ethers.BigNumber.from(String(collateralArray[i].quantity*10**18)))
         }
 
         drizzle.contracts.MasterContract.methods.create_index(drizzleState.accounts[0], temp_tokens, temp_quantities, name_index, symbol).send()
@@ -86,7 +87,7 @@ const Create = () => {
         drizzle.contracts.StorageContract.methods.vaultContract().call()
             .then(
                 (vaultContract) => {
-                    drizzle.contracts[token_address].methods.approve(vaultContract, 10000000).send({ from: drizzleState.accounts[0] })
+                    drizzle.contracts[token_address].methods.approve(vaultContract, ethers.BigNumber.from(String(10**20))).send({ from: drizzleState.accounts[0] })
                         .then(
                             (result) => {
                                 let stackID = drizzle.contracts.VaultContract.methods.approve(token_address, drizzleState.accounts[0]).call()
