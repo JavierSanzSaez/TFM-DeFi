@@ -5,9 +5,18 @@ contract StorageContract {
     address public masterContract;
     address payable public vaultContract;
     address public factoryContract;
+
     mapping(address => bool) public is_admin;
+
     mapping(address => address) index_creators;
     address[] public indices;
+
+    struct Index{
+        address[] collateral; // Which tokens the index references to
+        uint256[] quantities; // How many of each token the index references to
+    }
+
+    mapping (address => Index) index;
 
     modifier onlyAdmins{
         require(
@@ -46,9 +55,13 @@ contract StorageContract {
         _is_admin = is_admin[_address]; 
     }
 
-    function addNewIndex(address _index, address creator) external onlyAdmins{
+    function addNewIndex(address _index, address creator, address[] calldata _collateral, uint256[] calldata _quantities) external onlyAdmins{
         indices.push(_index);
         index_creators[_index] = creator;
+        index[_index] = Index({
+            collateral: _collateral,
+            quantities: _quantities
+        });
     }
 
     function getIndexCreator(address _index) external onlyAdmins view returns(address creator){
@@ -57,5 +70,10 @@ contract StorageContract {
 
     function getIndicesLength() external onlyAdmins view returns(uint length){
         length = indices.length;
+    }
+
+    function get_collateral(address _index) external view returns(address[] memory  _collateral, uint256[] memory _quantities){
+        _collateral = index[_index].collateral;
+        _quantities = index[_index].quantities;
     }
 }

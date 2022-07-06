@@ -150,7 +150,7 @@ contract MasterContract is MasterTools{
 
         new_index = factoryContractInstance.createIndex(name, symbol, _creator);
         
-        storageContractInstance.addNewIndex(new_index, _creator);
+        storageContractInstance.addNewIndex(new_index, _creator, _collateral, _quantities);
         vaultContractInstance.register_index(new_index,  _collateral, _quantities);
         vaultContractInstance.receive_collateral(_collateral, _quantities,_creator);
         vaultContractInstance.approve(new_index, _creator);
