@@ -54,7 +54,7 @@ const Indices = () => {
 
         for (let i = 0; i < list_indices_address.length; i++) {
             let name = call(list_indices_address[i], "name") || "";
-            let symbol = call(list_indices_address[i], "name") || "";
+            let symbol = call(list_indices_address[i], "symbol") || "";
 
             cells.push(
                 <IndexCard index_name={name} symbol={symbol} address={list_indices_address[i]} />

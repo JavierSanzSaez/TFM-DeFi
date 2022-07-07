@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { drizzleReactHooks } from '@drizzle/react-plugin'
 import { Link } from "react-router-dom";
-import {ethers} from "ethers"
+import { ethers } from "ethers"
 
 var Web3 = require('web3')
 
@@ -47,7 +47,7 @@ const Create = () => {
         let temp_quantities = []
         for (let i = 0; i < collateralArray.length; i++) {
             temp_tokens.push(collateralArray[i].token);
-            temp_quantities.push(ethers.BigNumber.from(String(collateralArray[i].quantity*10**18)))
+            temp_quantities.push(ethers.BigNumber.from(String(collateralArray[i].quantity * 10 ** 18)))
         }
 
         drizzle.contracts.MasterContract.methods.create_index(drizzleState.accounts[0], temp_tokens, temp_quantities, name_index, symbol).send()
@@ -87,7 +87,7 @@ const Create = () => {
         drizzle.contracts.StorageContract.methods.vaultContract().call()
             .then(
                 (vaultContract) => {
-                    drizzle.contracts[token_address].methods.approve(vaultContract, ethers.BigNumber.from(String(10**20))).send({ from: drizzleState.accounts[0] })
+                    drizzle.contracts[token_address].methods.approve(vaultContract, ethers.BigNumber.from(String(10 ** 20))).send({ from: drizzleState.accounts[0] })
                         .then(
                             (result) => {
                                 let stackID = drizzle.contracts.VaultContract.methods.approve(token_address, drizzleState.accounts[0]).call()
@@ -105,7 +105,7 @@ const Create = () => {
     return (
         <article className="FormCollateral">
             {!index_created ? <>
-                <h3>Create an Index!</h3>
+                <h2 className="form-title">Create an Index!</h2>
                 <p>
                     Name of the Index:  &nbsp;
                     <input key="name_index" type="text" name="name_index" value={name_index} placeholder="Name of the Token"
@@ -116,42 +116,47 @@ const Create = () => {
                     <input key="symbol" type="text" name="symbol" value={symbol} placeholder="Symbol"
                         onChange={ev => setSymbol(ev.target.value)} />
                 </p>
+                <p id="collateral-form"> Collateral:</p>
+                <div className="collateral-inputs">
+                    {
+                        collateralArray.map((input, index) => {
+                            return (
+                                <div className="collateral-entry" key={index}>
+                                    <input name="token" type="text" value={input.token} placeholder="0x...."
+                                        onChange={e => handleInputChange(e, index)} />
+                                    <input name="quantity" type="number" value={input.quantity}
+                                        onChange={e => handleInputChange(e, index)} />
+                                    <div className="btn-box">
+                                        {
+                                            index === collateralArray.length - 1 ?
+                                                (<button className="mr10"
+                                                    onClick={() => handleAddClick(index)}>Add more</button>)
+                                                :
+                                                (<button className="mr10"
+                                                    onClick={() => handleRemoveClick(index)}>Remove</button>)
+                                        }
+                                    </div>
 
-                {
-                    collateralArray.map((input, index) => {
-                        return (
-                            <div className="collateral-entry" key={index}>
-                                <input name="token" type="text" value={input.token} placeholder="0x...."
-                                    onChange={e => handleInputChange(e, index)} />
-                                <input name="quantity" type="number" value={input.quantity}
-                                    onChange={e => handleInputChange(e, index)} />
-                                <div className="btn-box">
-                                    {
-                                        index === collateralArray.length - 1 ?
-                                            (<button className="mr10"
-                                                onClick={() => handleAddClick(index)}>Add more</button>)
-                                            :
-                                            (<button className="mr10"
-                                                onClick={() => handleRemoveClick(index)}>Remove</button>)
+                                    {!input.approved && input.token.length === 42 ?
+                                        <button onClick={() => onHandleApproveToken(input.token, index)}>
+                                            Approve token
+                                        </button>
+                                        :
+                                        <></>
                                     }
+
                                 </div>
+                            )
+                        })
+                    }
 
-                                {!input.approved && input.token.length === 42 ?
-                                    <button onClick={() => onHandleApproveToken(input.token, index)}>
-                                        Approve token
-                                    </button>
-                                    :
-                                    <></>
-                                }
+                </div>
+                <div className="button">
+                    <button className="pure-button" type="button" onClick={(ev) => handleSubmit(ev)}>
+                        Create Index
+                    </button>
+                </div>
 
-                            </div>
-                        )
-                    })
-                }
-
-                <button className="pure-button" type="button" onClick={(ev) => handleSubmit(ev)}>
-                    Create Index
-                </button>
             </>
                 :
                 <>

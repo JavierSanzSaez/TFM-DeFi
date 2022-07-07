@@ -1,4 +1,3 @@
-
 .AppHeader {
   text-align: center;
   color: black;
@@ -77,11 +76,39 @@ th {
   margin: 10px;
 }
 
-.indices-header{
+.indices-header {
   text-align: center;
 }
-.index-detail-title{
+
+.index-detail-title {
   text-align: center;
+}
+
+/* Form */
+
+.FormCollateral {
+  border-radius: 10px;
+  padding: 20px;
+  background: radial-gradient(#F0CA41 0%, #00ffcc 90%);
+
+}
+
+.form-title {
+  text-align: center;
+}
+
+#collateral-form {
+  text-align: center;
+}
+
+.collateral-inputs {
+  margin-top: 10px;
+  margin-bottom: 40px;
+}
+
+.button {
+  display: flex;
+  justify-content: center;
 }
 
 /* Footer */
@@ -92,34 +119,39 @@ th {
   width: 100%;
   background: linear-gradient(to bottom right, #F0CA41 0%, #00ffcc 100%);
 }
+
 p.author {
   width: 100%;
   text-align: center;
 }
 
 /* Body */
-html{
+html {
   font-family: 'Courier New', Courier, monospace;
 }
 
 /* App Body */
 
-.home{
+.home {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
-.home-numberOfIndices{
+
+.home-numberOfIndices {
   flex: 1 1 auto;
 }
 
-.app-body{
+.app-body {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-html{
+
+/* General */
+
+html {
   height: 100%;
   background: linear-gradient(to bottom right, #ff00ff 0%, #F0CA41 100%);
 }
